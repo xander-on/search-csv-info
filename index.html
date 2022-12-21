@@ -12,17 +12,20 @@
 
   <br><br><br><br><br>
 
-  <input type="file" id="inputFileLoad" accept=".csv"/>
-
-  <pre id="mostrarContenido"></pre>
+  <div id="mainElements">
+    <label for="inputFileLoad">Subir Archivo</label>
+    <input type="file" id="inputFileLoad" accept=".csv"/>
+    <br>
+    <br>
+    <input type="text" id="searchInput" class="d-none" placeholder="Buscar..."/>
+  </div>
+  
 
   <table id="tableInfo">
     <thead>
       <tr></tr>
     </thead>
-
     <tbody></tbody>
-
   </table>
 
   <script src="index.js"></script>

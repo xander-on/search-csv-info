@@ -6,70 +6,76 @@ const leerArchivo = (e) => {
 
   const lector = new FileReader();
   lector.onload = function(e){
-    const contenido = e.target.result;
-    const allLines = contenido.split('\r\n');
-    const headers = allLines[0];
-    const fieldNames = headers.split(',');
-
-    const arrayInfo = convertirContenido( fieldNames, allLines );
-
-    mostrarContenido(fieldNames, arrayInfo);
+    dataFile = e.target.result.split('\r\n');
+    headersFields = dataFile[0].split(',');
+    const infoArray = convertirContenido( dataFile );
+    mostrarContenido( infoArray );
   };
 
   lector.readAsText(archivo);
 }
 
 
-const convertirContenido = ( fieldNames, allLines ) => {
-  const dataLines = allLines.slice(1);
-  const objList = dataLines.map( (dataLine)=>{
-    let obj = {};
-    const data = dataLine.split(',');
+const convertirContenido = ( dataFile ) => {
+  const dataLines = dataFile.slice(1).filter( dataLine => dataLine != "");
+  objList = dataLines.map( (dataLine)=>{
+      let obj = {};
+      const data = dataLine.split(',');
 
-    fieldNames.forEach( (fieldName, index)=> {
-      const asNumber = Number(data[index]);
-      fieldName = fieldName.split(" ").join("");
-
-      obj[fieldName.toLowerCase()] = isNaN(asNumber) ? data[index] : asNumber;
-    });
-
-    return obj;
+      headersFields.forEach( (header, index)=> {
+        const asNumber = Number(data[index]);
+        header = header.split(" ").join("");
+        obj[header.toLowerCase()] = isNaN(asNumber) ? data[index] : asNumber;
+      });
+      return obj;
   });
-  
   return objList;
 }
 
 
-const mostrarContenido = (fieldNames, arrayInfo) => {
+const mostrarContenido = ( infoArray ) => {
   const $tableInfo = document.querySelector('#tableInfo');
   const $tableHead = $tableInfo.querySelector('thead tr');
   const $tableBody = $tableInfo.querySelector('tbody');
   const $fragment = document.createDocumentFragment();
+  $searchInput.classList.remove('d-none');
+
+  $tableHead.innerHTML = '';
+  $tableBody.innerHTML = '';
 
 
-  fieldNames.forEach( (field) => {
+
+  headersFields.forEach( (field) => {
     const td = document.createElement('td');
     td.innerHTML = field;
     $tableHead.appendChild(td);
   });
 
 
-  arrayInfo.forEach( (objeto)=> {
+  infoArray.forEach( (objeto)=> {
     const tr = document.createElement('tr');
 
     for (let clave in objeto){
       const td = document.createElement('td');
       td.innerHTML = objeto[clave];
       tr.appendChild( td );
-      // console.log(objeto[clave]);
+      $fragment.appendChild( tr )
     }
-    // console.log(objeto)
-    $tableBody.appendChild(tr);
+    $tableBody.appendChild( $fragment );
   });
 }
 
+const filtarInfo = ( e ) => {
+  const word = e.target.value.trim();
+  const searchInfo = objList.filter( (element) => element.name.toLowerCase().includes(word) );
+  mostrarContenido( searchInfo );
+}
 
 const $inputFileLoad = document.querySelector('#inputFileLoad');
 $inputFileLoad.addEventListener('change', leerArchivo, false);
+
+const $searchInput = document.querySelector('#searchInput');
+$searchInput.addEventListener('keyup', filtarInfo);
+
 
 
